@@ -4,7 +4,7 @@
 Summary: Lightweight, non-caching, optionally anonymizing HTTP proxy
 Name: tinyproxy
 Version: 1.8.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://tinyproxy.sourceforge.net/
@@ -39,7 +39,7 @@ EOF
 #
 # processname: tinyproxy
 # config: /etc/tinyproxy/tinyproxy.conf
-# pidfile: /var/run/tinyproxy.pid
+# pidfile: /var/run/tinyproxy/tinyproxy.pid
 
 # Source function library.
 source /etc/rc.d/init.d/functions
@@ -52,7 +52,7 @@ source /etc/sysconfig/network
 
 [ -f %{_sysconfdir}/tinyproxy/tinyproxy.conf ] || exit 0
 
-DAEMON="%{_bindir}/tinyproxy"
+DAEMON="%{_sbindir}/tinyproxy"
 OPTIONS=
 NAME=tinyproxy
 DESC=tinyproxy
@@ -124,6 +124,9 @@ touch %{buildroot}%{_sysconfdir}/tinyproxy/filter
 %{__install} -Dp -m0755 tinyproxy.sysv %{buildroot}%{_initrddir}/tinyproxy
 %{__install} -Dp -m0644 tinyproxy.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/tinyproxy
 
+%{__install} -d -m0755 %{buildroot}%{_localstatedir}/log/tinyproxy/
+%{__install} -d -m0755 %{buildroot}%{_localstatedir}/run/tinyproxy/
+
 ### Clean up buildroot
 %{__rm} -f %{buildroot}%{_sysconfdir}/tinyproxy-dist
 
@@ -154,8 +157,15 @@ fi
 %config %{_initrddir}/tinyproxy
 %{_sbindir}/tinyproxy
 %{_datadir}/tinyproxy/
+%defattr(-, nobody, nobody, 0700) 
+%dir %{_localstatedir}/log/tinyproxy/
+%dir %{_localstatedir}/run/tinyproxy/
 
 %changelog
+* Sun Oct 12 2014 Nigel Sim <nigel.sim@gmail.com> - 1.8.2-2
+- Fixed init script
+- Create log and run directories
+
 * Thu Oct 21 2010 Dag Wieers <dag@wieers.com> - 1.8.2-1
 - Fixed initscript. (Johan Huysmans)
 
